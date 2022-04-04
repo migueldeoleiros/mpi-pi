@@ -25,11 +25,11 @@ int main(int argc, char *argv[]) {
             MPI_Recv(&n,1,MPI_INT,0,0,MPI_COMM_WORLD,&status);
 
         if (n == 0)
-                break;
+            break;
                 
         count = 0;  
 
-        for (i = 1; i <= n; i+=numprocs) {
+        for (i = rank; i <= n; i+=numprocs) {
             // Get the random numbers between 0 and 1
             x = ((double) rand()) / ((double) RAND_MAX);
             y = ((double) rand()) / ((double) RAND_MAX);
@@ -45,8 +45,10 @@ int main(int argc, char *argv[]) {
         if(rank!=0)
             MPI_Send(&count,1,MPI_INT,0,0,MPI_COMM_WORLD);
         else{
-            MPI_Recv(&localCount,1,MPI_INT,MPI_ANY_SOURCE,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
-            count+=localCount;
+            for(i = 1;i<numprocs;i++){
+                MPI_Recv(&localCount,1,MPI_INT,MPI_ANY_SOURCE,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+                count+=localCount;
+            }
             pi = ((double) count/(double) n)*4.0;
             printf("pi is approx. %.16f, Error is %.16f\n", pi, fabs(pi - PI25DT));
         }    
