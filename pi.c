@@ -18,12 +18,8 @@ int main(int argc, char *argv[]) {
         if(rank==0){
             printf("Enter the number of points: (0 quits) \n");
             scanf("%d",&n);
-            for(i=1;i<numprocs;i++)
-                MPI_Send(&n,1,MPI_INT,i,0,MPI_COMM_WORLD);
         }
-        else 
-            MPI_Recv(&n,1,MPI_INT,0,0,MPI_COMM_WORLD,&status);
-
+        MPI_Bcast(&n,1,MPI_INT,0,MPI_COMM_WORLD);
         if (n == 0)
             break;
                 
@@ -42,16 +38,12 @@ int main(int argc, char *argv[]) {
                 count++;
         }
         
-        if(rank!=0)
-            MPI_Send(&count,1,MPI_INT,0,0,MPI_COMM_WORLD);
-        else{
-            for(i = 1;i<numprocs;i++){
-                MPI_Recv(&localCount,1,MPI_INT,MPI_ANY_SOURCE,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
-                count+=localCount;
-            }
+        localCount=count;
+        MPI_Reduce(&localCount,&count,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
+        if(rank==0){
             pi = ((double) count/(double) n)*4.0;
-            printf("pi is approx. %.16f, Error is %.16f\n", pi, fabs(pi - PI25DT));
-        }    
+            printf("pi is approx. %.16f, Error is %.16f\n", pi, fabs(pi - PI25DT));   
+        }
     }
      MPI_Finalize();
 }
