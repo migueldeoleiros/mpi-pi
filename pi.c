@@ -3,6 +3,36 @@
 #include <math.h>
 #include <mpi.h>
 
+//REDUCE
+int MPI_FlattreeColectiva(void * buff, void *recvbuff, int count,
+                          MPI_Datatype datatype, int root, MPI_Comm comm){
+    
+    int numprocs,rank;
+    double n,localCount;
+    MPI_Status status;
+    MPI_Comm_size(comm,&numprocs);
+    MPI_Comm_rank(comm,&rank);
+
+    if(rank==root){
+        localCount = *(double*) buff;
+        for(int i=0;i<numprocs;i++){
+            if(i==root)
+                continue;
+            MPI_Recv(&n,count,datatype,MPI_ANY_SOURCE,0,comm,&status); 
+            localCount+= n;   
+        }
+        *(double*) recvbuff = localCount; 
+    }
+    else{
+        for(int i=0;i<numprocs;i++){
+            if(i==root)
+                continue;
+            MPI_Send(buff,1,datatype,root,0,comm);
+        }
+    }
+    return MPI_SUCCESS;
+}
+
 int main(int argc, char *argv[]) {
     int i, done = 0, n, count, localCount;
     int numprocs,rank;
@@ -39,7 +69,7 @@ int main(int argc, char *argv[]) {
         }
         
         localCount=count;
-        MPI_Reduce(&localCount,&count,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
+        MPI_FlattreeColectiva(&localCount,&count,1,MPI_INT,0,MPI_COMM_WORLD);
         if(rank==0){
             pi = ((double) count/(double) n)*4.0;
             printf("pi is approx. %.16f, Error is %.16f\n", pi, fabs(pi - PI25DT));   
