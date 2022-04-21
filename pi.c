@@ -23,13 +23,8 @@ int MPI_FlattreeColectiva(void * buff, void *recvbuff, int count,
         }
         *(double*) recvbuff = localCount; 
     }
-    else{
-        for(int i=0;i<numprocs;i++){
-            if(i==root)
-                continue;
-            MPI_Send(buff,1,datatype,root,0,comm);
-        }
-    }
+    else
+        MPI_Send(buff,1,datatype,root,0,comm);
     return MPI_SUCCESS;
 }
 
