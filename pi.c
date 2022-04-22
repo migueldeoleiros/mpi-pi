@@ -27,16 +27,16 @@ int MPI_FlattreeColectiva(void * buff, void *recvbuff, int count,
         MPI_Send(buff,1,datatype,root,0,comm);
     return MPI_SUCCESS;
 }
-
+//BROADCAST
 int MPI_BinomialCast(void *buff, int count, MPI_Datatype datatype, int root, MPI_Comm comm){
     int rank,numprocs;
     MPI_Comm_size(comm,&numprocs);
     MPI_Comm_rank(comm,&rank);
     MPI_Status status;
     for(int i=1;i<numprocs-1;i++){
-        int umbral = pow(2,i-1);
-        if(rank<umbral){
-            MPI_Send(buff,count,datatype,(rank+umbral)%numprocs,0,comm);
+        int dest = pow(2,i-1);
+        if(rank<dest){
+            MPI_Send(buff,count,datatype,(rank+dest)%numprocs,0,comm);
         }
         else{
             if(rank<pow(2,i)){
@@ -81,7 +81,6 @@ int main(int argc, char *argv[]) {
             if(z <= 1.0)
                 count++;
         }
-        
         localCount=count;
         MPI_FlattreeColectiva(&localCount,&count,1,MPI_INT,0,MPI_COMM_WORLD);
         if(rank==0){
