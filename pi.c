@@ -35,8 +35,9 @@ int MPI_BinomialCast(void *buff, int count, MPI_Datatype datatype, int root, MPI
     MPI_Status status;
     for(int i=1;i<numprocs-1;i++){
         int umbral = pow(2,i-1);
-        if(rank<umbral)
-            MPI_Send(buff,count,datatype,rank+umbral,0,comm);
+        if(rank<umbral){
+            MPI_Send(buff,count,datatype,(rank+umbral)%numprocs,0,comm);
+        }
         else{
             if(rank<pow(2,i)){
                 MPI_Recv(buff,1,datatype,MPI_ANY_SOURCE,0,comm,&status);
