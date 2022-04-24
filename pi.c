@@ -16,10 +16,10 @@ int MPI_FlattreeColectiva(void * buff, void *recvbuff, int count,
     if(rank==root){
         localCount = *(double*) buff;
         for(int i=0;i<numprocs;i++){
-            if(i==root)
-                continue;
-            MPI_Recv(&n,count,datatype,MPI_ANY_SOURCE,0,comm,&status); 
-            localCount+= n;   
+            if(i!=root){
+                MPI_Recv(&n,count,datatype,MPI_ANY_SOURCE,0,comm,&status); 
+                localCount+= n;
+            }   
         }
         *(double*) recvbuff = localCount; 
     }
@@ -33,11 +33,10 @@ int MPI_BinomialBCast(void *buff, int count, MPI_Datatype datatype, int root, MP
     MPI_Comm_size(comm,&numprocs);
     MPI_Comm_rank(comm,&rank);
     MPI_Status status;
-    for(int i=1;i<numprocs-1;i++){
+    for(int i=1;i<=ceil(log2(numprocs));i++){
         int dest = pow(2,i-1);
-        if(rank<dest){
+        if(rank<dest)
             MPI_Send(buff,count,datatype,(rank+dest)%numprocs,0,comm);
-        }
         else{
             if(rank<pow(2,i))
                 MPI_Recv(buff,1,datatype,MPI_ANY_SOURCE,0,comm,&status);
