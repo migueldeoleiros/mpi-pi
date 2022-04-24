@@ -42,7 +42,7 @@ int MPI_BinomialBCast(void *buff, int count, MPI_Datatype datatype,
         if(rank < mask && (rank + mask < numprocs)){
             MPI_Send(buff, count, datatype, (rank + mask), 0, comm);
         } else if(rank >= mask && rank < mask << 1){
-            MPI_Recv(buff, count, datatype, (rank - mask), 0, comm, MPI_STATUS_IGNORE);
+            MPI_Recv(buff, count, datatype, (rank - mask), 0, comm, &status);
         }
 
         mask <<= 1;
