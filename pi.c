@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
                 
         count = 0;  
 
-        for (i = rank; i <= n; i+=numprocs) {
+        for (i = rank+1; i <= n; i+=numprocs) {
             // Get the random numbers between 0 and 1
             x = ((double) rand()) / ((double) RAND_MAX);
             y = ((double) rand()) / ((double) RAND_MAX);
