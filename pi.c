@@ -28,7 +28,7 @@ int MPI_FlattreeColectiva(void * buff, void *recvbuff, int count,
     return MPI_SUCCESS;
 }
 //BROADCAST
-int MPI_BinomialCast(void *buff, int count, MPI_Datatype datatype, int root, MPI_Comm comm){
+int MPI_BinomialBCast(void *buff, int count, MPI_Datatype datatype, int root, MPI_Comm comm){
     int rank,numprocs;
     MPI_Comm_size(comm,&numprocs);
     MPI_Comm_rank(comm,&rank);
@@ -39,9 +39,8 @@ int MPI_BinomialCast(void *buff, int count, MPI_Datatype datatype, int root, MPI
             MPI_Send(buff,count,datatype,(rank+dest)%numprocs,0,comm);
         }
         else{
-            if(rank<pow(2,i)){
+            if(rank<pow(2,i))
                 MPI_Recv(buff,1,datatype,MPI_ANY_SOURCE,0,comm,&status);
-            }
         }
     }
     return MPI_SUCCESS;
@@ -63,7 +62,7 @@ int main(int argc, char *argv[]) {
             printf("Enter the number of points: (0 quits) \n");
             scanf("%d",&n);
         }
-        MPI_BinomialCast(&n,1,MPI_INT,0,MPI_COMM_WORLD);
+        MPI_BinomialBCast(&n,1,MPI_INT,0,MPI_COMM_WORLD);
         if (n == 0)
             break;
                 
