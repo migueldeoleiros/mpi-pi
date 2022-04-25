@@ -6,27 +6,27 @@
 //REDUCE
 int MPI_FlattreeColectiva(void * buff, void *recvbuff, int count,
                           MPI_Datatype datatype, int root, MPI_Comm comm){
-    
     int numprocs,rank;
-    double n,localCount;
+    double n,totalCount;
     MPI_Status status;
     MPI_Comm_size(comm,&numprocs);
     MPI_Comm_rank(comm,&rank);
 
     if(rank==root){
-        localCount = *(double*) buff;
+        totalCount = *(double*) buff;
         for(int i=0;i<numprocs;i++){
             if(i!=root){
                 MPI_Recv(&n,count,datatype,MPI_ANY_SOURCE,0,comm,&status); 
-                localCount+= n;   
+                totalCount+= n;   
             }
         }
-        *(double*) recvbuff = localCount; 
+        *(double*) recvbuff = totalCount; 
     }
     else
         MPI_Send(buff,1,datatype,root,0,comm);
     return MPI_SUCCESS;
 }
+
 //BROADCAST
 int MPI_BinomialBCast(void *buff, int count, MPI_Datatype datatype,
                       int root, MPI_Comm comm){
