@@ -1,0 +1,52 @@
+/Los ejercicios están resueltos cada uno en una rama, para facilitar ver el resultado/
+
+* [[https://github.com/migueldeoleiros/mpi-pi/tree/p1][P1 Estimación de PI mediante el método de Montecarlo]]
+- Aproximación geométrica el valor de PI
+- Genera /N/ puntos aleatorios dentro de un cuadrado S con longitud de lado 2, centrado en (0,0)
+- Asume un círculo /D/ de radio 1 también dentrado en (0,0)
+- La cantidad de puntos aleatorios que caen dentro del círculo es proporcional a pi
+[[https://latex.codecogs.com/svg.image?Q=%5Cfrac%7BA(D)%7D%7BA(S)%7D=%5Cfrac%7B%5Cpi%20%5Ctimes%20r%7D%7BI%5E%7B2%7D%7D=%5Cfrac%7B%5Cpi%7D%7B4%7D]]
+- A mayor N, más precisa la aproximación de PI
+
+Nuestro trabajo consistía en hacer una implementación SPMD con la entrada y salida en el proceso 0.
+Distribuir /n/ y recoger la estimación de PI en cada proceso usando /Send/ y /Recv/.
+Se nos indicó repartir la carga de trabajo en el bucle for con "pasos" (i+=numprocs) para que los procesos se alternaran en lugar de hacerlo por bloques.
+
+Para distribuir /n/ desde el proceso 0 usamos un bucle for con /MPI_Send/ mientras que el resto de procesos lo reciben con /MPI_Recv/. Para recoger la estimación de PI hacemos lo contrario, los procesos usan /MPI_send/ para enviar su parte y el proceso 0 las recive con /MPI_Recv/ y luego suma.
+
+* P2 Colectivas MPI en la etimación de PI
+Para la segunda práctica tuvimos que mejorar el código de la primera.
+
+** [[https://github.com/migueldeoleiros/mpi-pi/tree/p2-a][Apartado a]]
+Substituir los /Send/Recv/ por operaciones colectivas
+
+Para distribuir /n/ ahora usamos /MPI_Bcast/ y para recoger la estimación /MPI_Reduce/
+
+** [[https://github.com/migueldeoleiros/mpi-pi/tree/p2-b][Apartado b]]
+Implementación propia de las funciones colectivas.
+Para al distribución de /n/ una implementación en árbol binomial /MPI_BinomialColectiva/
+Para la recolección del /count/ implementar /MPI_FlattreeColectiva/ asumiendo que la operación a realizar será una suma.
+
+La implementación de /MPI_FlattreeColectiva/ es esencialmente lo mismo que hicimos en la práctica 1, pero generalizando para cualquier caso de /root/
+
+Para /MPI_BinomialBCast/ usamos el desplazamiento de bits para simplificar las operaciones. Tenemos una máscara que se irá incrementando y la usamos para calcular a que procesos se enviará el dato.
+Esto se entiendo bien al ver los números en una tabla traducidos a binario.
+
+Máscara *00000001*
+|   |     Send |   |     Recv |
+|---+----------+---+----------|
+| 0 | 00000000 | 1 | 00000001 |
+
+Máscara *00000010*
+|   |     Send |   |     Recv |
+|---+----------+---+----------|
+| 0 | 00000000 | 2 | 00000010 |
+| 1 | 00000001 | 3 | 00000011 |
+
+Máscara *00000100*
+|   |     Send |   |     Recv |
+|---+----------+---+----------|
+| 0 | 00000000 | 4 | 00000100 |
+| 1 | 00000001 | 5 | 00000101 |
+| 2 | 00000010 | 6 | 00000110 |
+| 3 | 00000011 | 7 | 00000111 |
