@@ -5,7 +5,7 @@
 - Genera /N/ puntos aleatorios dentro de un cuadrado S con longitud de lado 2, centrado en (0,0)
 - Asume un círculo /D/ de radio 1 también dentrado en (0,0)
 - La cantidad de puntos aleatorios que caen dentro del círculo es proporcional a pi
-[[https://latex.codecogs.com/svg.image?Q=%5Cfrac%7BA(D)%7D%7BA(S)%7D=%5Cfrac%7B%5Cpi%20%5Ctimes%20r%7D%7BI%5E%7B2%7D%7D=%5Cfrac%7B%5Cpi%7D%7B4%7D]]
+#+html: <p align="left"><img src="https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D%5Cbg%7Bwhite%7DQ=%5Cfrac%7BA(D)%7D%7BA(S)%7D=%5Cfrac%7B%5Cpi%20%5Ctimes%20r%7D%7BI%5E%7B2%7D%7D=%5Cfrac%7B%5Cpi%7D%7B4%7D" /></p>
 - A mayor N, más precisa la aproximación de PI
 
 Nuestro trabajo consistía en hacer una implementación SPMD con la entrada y salida en el proceso 0.
